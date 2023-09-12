@@ -1,0 +1,31 @@
+name: Release to Appetize.io
+
+on:
+  push:
+    branches:
+      - main # Change to your main branch name if different
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build your App
+        run: ./gradlew assemblerelease
+
+      - name: Upload to Appetize.io
+        run: |
+          curl -X POST "https://${{ secrets.API_TOKEN }}@api.appetize.io/v1/apps" \
+          -F "file=@android/app/build/outputs/apk/release/app-release.apk" \
+          -F "platform=ios"
